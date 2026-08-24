@@ -12,7 +12,11 @@ conectarBanco();
 
 // --- MIDDLEWARES GLOBAIS ---
 // Permite que o Front-end em React acesse esta API com segurança
-app.use(cors());
+app.use(cors({
+  origin: 'https://vercel.app',
+  methods: ['GET', 'POST', 'PUT', 'DELETE'],
+  credentials: true
+}));
 
 // Habilita o servidor a receber e entender dados no formato JSON no corpo das requisições (req.body)
 app.use(express.json());
