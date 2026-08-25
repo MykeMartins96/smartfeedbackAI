@@ -13,7 +13,7 @@ conectarBanco();
 // --- MIDDLEWARES GLOBAIS ---
 // Permite que o Front-end em React acesse esta API com segurança
 app.use(cors({
-  origin: 'https://vercel.app',
+  origin: 'https://smartfeedback-ai.vercel.app',
   methods: ['GET', 'POST', 'PUT', 'DELETE'],
   credentials: true
 }));
