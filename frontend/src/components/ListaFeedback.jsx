@@ -1,8 +1,11 @@
 import React from 'react';
+
 import styled from 'styled-components';
+
 import { Star, MessageSquareCode } from 'lucide-react';
 
 // --- ELEMENTOS ESTILIZADOS COM STYLED-COMPONENTS ---
+
 const ContainerLista = styled.div`
   background-color: #ffffff;
   padding: 24px;
@@ -55,19 +58,26 @@ const SeloSentimento = styled.span`
   padding: 4px 10px;
   border-radius: 9999px;
   text-transform: uppercase;
-  
-  /* Lógica dinâmica de cores baseada na resposta da IA */
-  background-color: ${(props) => 
-    props.tipo === 'Positivo' ? '#dcfce7' : props.tipo === 'Negativo' ? '#fee2e2' : '#f1f5f9'};
-  color: ${(props) => 
-    props.tipo === 'Positivo' ? '#166534' : props.tipo === 'Negativo' ? '#991b1b' : '#475569'};
+
+  background-color: ${(props) =>
+    props.tipo === 'Positivo'
+      ? '#dcfce7'
+      : props.tipo === 'Negativo'
+        ? '#fee2e2'
+        : '#f1f5f9'};
+
+  color: ${(props) =>
+    props.tipo === 'Positivo'
+      ? '#166534'
+      : props.tipo === 'Negativo'
+        ? '#991b1b'
+        : '#475569'};
 `;
 
 const BlocoEstrelas = styled.div`
   display: flex;
   align-items: center;
   gap: 2px;
-  color: #eab308;
 `;
 
 const TextoBruto = styled.p`
@@ -86,7 +96,7 @@ const ResumoIA = styled.p`
   color: #0f172a;
   font-weight: 500;
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   gap: 6px;
 
   span {
@@ -95,43 +105,66 @@ const ResumoIA = styled.p`
   }
 `;
 
-// --- COMPONENTE PRINCIPAL REACT (CORRIGIDO PARA SINGULAR) ---
+// --- COMPONENTE PRINCIPAL REACT ---
+
 const ListaFeedback = ({ feedbacks }) => {
   if (feedbacks.length === 0) {
     return (
       <ContainerLista>
-        <Titulo><MessageSquareCode size={20} /> Histórico de Análises</Titulo>
-        <SemDados>Nenhum feedback analisado ainda. Cole um texto acima para começar!</SemDados>
+        <Titulo>
+          <MessageSquareCode size={20} />
+          Histórico de Análises
+        </Titulo>
+
+        <SemDados>
+          Nenhum feedback analisado ainda. Cole um texto acima para começar!
+        </SemDados>
       </ContainerLista>
     );
   }
 
   return (
     <ContainerLista>
-      <Titulo><MessageSquareCode size={20} /> Histórico de Análises</Titulo>
+      <Titulo>
+        <MessageSquareCode size={20} />
+        Histórico de Análises
+      </Titulo>
 
-      {feedbacks.map((item) => (
-        <ItemFeedback key={item._id}>
-          <LinhaSuperior>
-            <SeloSentimento tipo={item.sentimento}>{item.sentimento}</SeloSentimento>
-            
-            <BlocoEstrelas>
-              {[...Array(item.nota)].map((_, i) => (
-                <Star key={i} size={16} fill="#eab308" />
-              ))}
-            </BlocoEstrelas>
-          </LinhaSuperior>
+      {feedbacks.map((item) => {
+        const nota = Number(item.nota) || 0;
 
-          <TextoBruto>"{item.comentarioBruto}"</TextoBruto>
-          
-          <ResumoIA>
-            <span>Insight da IA:</span> {item.resumoIA}
-          </ResumoIA>
-        </ItemFeedback>
-      ))}
+        return (
+          <ItemFeedback key={item._id}>
+            <LinhaSuperior>
+              <SeloSentimento tipo={item.sentimento}>
+                {item.sentimento}
+              </SeloSentimento>
+
+              <BlocoEstrelas>
+                {[1, 2, 3, 4, 5].map((estrela) => (
+                  <Star
+                    key={estrela}
+                    size={16}
+                    fill={estrela <= nota ? '#eab308' : 'none'}
+                    color={estrela <= nota ? '#eab308' : '#cbd5e1'}
+                  />
+                ))}
+              </BlocoEstrelas>
+            </LinhaSuperior>
+
+            <TextoBruto>
+              "{item.texto}"
+            </TextoBruto>
+
+            <ResumoIA>
+              <span>Insight da IA:</span>
+              {item.resumoIA || 'Sem insight disponível'}
+            </ResumoIA>
+          </ItemFeedback>
+        );
+      })}
     </ContainerLista>
   );
 };
 
-// CORRIGIDO PARA SINGULAR
 export default ListaFeedback;

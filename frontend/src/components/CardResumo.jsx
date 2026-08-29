@@ -1,8 +1,11 @@
 import React from 'react';
+
 import styled from 'styled-components';
+
 import { MessageSquare, Star, Smile } from 'lucide-react';
 
 // --- ELEMENTOS ESTILIZADOS COM STYLED-COMPONENTS ---
+
 const GridCards = styled.div`
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
@@ -52,14 +55,29 @@ const IconeContainer = styled.div`
 `;
 
 // --- COMPONENTE PRINCIPAL REACT ---
+
 const CardResumo = ({ feedbacks }) => {
   const totalFeedbacks = feedbacks.length;
 
-  const mediaNotas = totalFeedbacks > 0
-    ? (feedbacks.reduce((acc, curr) => acc + curr.nota, 0) / totalFeedbacks).toFixed(1)
-    : '0.0';
+  // Considera somente os feedbacks que possuem nota
+  const feedbacksComNota = feedbacks.filter(
+    (feedback) => typeof feedback.nota === 'number'
+  );
 
-  const totalPositivos = feedbacks.filter((f) => f.sentimento === 'Positivo').length;
+  // Calcula a média apenas dos registros com nota
+  const mediaNotas =
+    feedbacksComNota.length > 0
+      ? (
+          feedbacksComNota.reduce(
+            (acc, curr) => acc + curr.nota,
+            0
+          ) / feedbacksComNota.length
+        ).toFixed(1)
+      : '0.0';
+
+  const totalPositivos = feedbacks.filter(
+    (f) => f.sentimento === 'Positivo'
+  ).length;
 
   return (
     <GridCards>
@@ -69,17 +87,19 @@ const CardResumo = ({ feedbacks }) => {
           <Rotulo>Total Analisado</Rotulo>
           <Valor>{totalFeedbacks}</Valor>
         </Info>
+
         <IconeContainer corFundo="#eff6ff" corIcone="#3b82f6">
           <MessageSquare size={24} />
         </IconeContainer>
       </Card>
 
-      {/* CARD 2: MÉDIA DO NEGÓCIO */}
+      {/* CARD 2: MÉDIA DE NOTAS */}
       <Card>
         <Info>
           <Rotulo>Média de Notas</Rotulo>
           <Valor>{mediaNotas} / 5.0</Valor>
         </Info>
+
         <IconeContainer corFundo="#fefce8" corIcone="#eab308">
           <Star size={24} />
         </IconeContainer>
@@ -91,6 +111,7 @@ const CardResumo = ({ feedbacks }) => {
           <Rotulo>Satisfeitos (IA)</Rotulo>
           <Valor>{totalPositivos}</Valor>
         </Info>
+
         <IconeContainer corFundo="#f0fdf4" corIcone="#22c55e">
           <Smile size={24} />
         </IconeContainer>
@@ -99,5 +120,4 @@ const CardResumo = ({ feedbacks }) => {
   );
 };
 
-// CORRIGIDO: Adicionada a exportação default que estava faltando e travando a tela!
 export default CardResumo;

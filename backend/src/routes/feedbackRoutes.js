@@ -1,7 +1,9 @@
 const express = require('express');
+
 const router = express.Router();
 
 const { GoogleGenAI } = require('@google/genai');
+
 const Feedback = require('../models/Feedback');
 
 const ai = new GoogleGenAI({
@@ -28,10 +30,31 @@ const criarFeedback = async (req, res) => {
     const response = await ai.models.generateContent({
       model: 'gemini-3.6-flash',
       contents: `
-        Analise o seguinte feedback e responda APENAS
-        com uma das três palavras:
+        Analise o feedback abaixo.
 
-        Positivo, Negativo ou Neutro.
+        Responda APENAS neste formato:
+
+        sentimento|nota|resumo
+
+        Regras:
+
+        - sentimento deve ser:
+          Positivo, Negativo ou Neutro
+
+        - nota deve ser um número inteiro de 1 a 5
+
+        - resumo deve ser uma opinião curta e objetiva
+          sobre o que o cliente demonstrou no feedback
+
+        Não use o caractere "|" dentro do resumo.
+
+        Exemplos:
+
+        Positivo|5|O cliente demonstrou muita satisfação com o produto e o atendimento.
+
+        Neutro|3|O cliente gostou do produto, mas demonstrou insatisfação com o prazo de entrega.
+
+        Negativo|1|O cliente ficou insatisfeito com o produto e com a qualidade do atendimento.
 
         Feedback: "${texto}"
       `
@@ -39,11 +62,34 @@ const criarFeedback = async (req, res) => {
 
     console.log('🤖 Resposta Gemini:', response.text);
 
-    const sentimento = response.text.trim();
+    const respostaIA = response.text.trim();
+
+    const partes = respostaIA.split('|');
+
+    const sentimento = partes[0]?.trim();
+    const nota = Number(partes[1]?.trim());
+    const resumoIA = partes.slice(2).join('|').trim();
+
+    // Validação da resposta da IA
+    if (
+      !['Positivo', 'Negativo', 'Neutro'].includes(sentimento) ||
+      !Number.isInteger(nota) ||
+      nota < 1 ||
+      nota > 5 ||
+      !resumoIA
+    ) {
+      console.error('❌ Resposta inválida da Gemini:', respostaIA);
+
+      return res.status(500).json({
+        error: 'A IA retornou uma resposta em formato inválido.'
+      });
+    }
 
     const novoFeedback = await Feedback.create({
       texto,
-      sentimento
+      sentimento,
+      nota,
+      resumoIA
     });
 
     console.log('💾 Feedback salvo no MongoDB');
@@ -80,8 +126,9 @@ const listarFeedbacks = async (req, res) => {
   }
 };
 
-// Rotas
+// ROTAS
 router.post('/feedbacks', criarFeedback);
+
 router.get('/feedbacks', listarFeedbacks);
 
 module.exports = router;
