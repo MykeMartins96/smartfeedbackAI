@@ -56,3 +56,5 @@ Também resolvi problemas relacionados à comunicação entre frontend e backend
 👉 [Acessar SmartFeedback AI](https://smartfeedback-ai.vercel.app/)
 
 ## 📸 Imagem do Projeto
+
+![SmartFeedback AI](https://github.com/MykeMartins96/smartfeedbackAI/blob/main/backend/src/Captura%20de%20tela%202026-08-23%20215402.png?raw=true)
