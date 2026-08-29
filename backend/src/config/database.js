@@ -1,8 +1,20 @@
-const { createClient } = require('@supabase/supabase-js');
+const mongoose = require('mongoose');
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+const conectarBanco = async () => {
+  try {
+    // Mudamos de MONGODB_URI para MONGO_URI para bater com o seu .env
+    const uri = process.env.MONGO_URI;
+    
+    if (!uri) {
+      throw new Error("A variável MONGO_URI não foi encontrada no arquivo .env");
+    }
 
-const supabase = createClient(supabaseUrl, supabaseKey);
+    await mongoose.connect(uri);
+    console.log('🍃 MongoDB Conectado com sucesso!');
+  } catch (error) {
+    console.error('❌ Erro ao conectar ao MongoDB:', error.message);
+    process.exit(1);
+  }
+};
 
-module.exports = { supabase };
+module.exports = { conectarBanco };

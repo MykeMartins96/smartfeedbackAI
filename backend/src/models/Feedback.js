@@ -1,29 +1,18 @@
 const mongoose = require('mongoose');
 
 const FeedbackSchema = new mongoose.Schema({
-  comentarioBruto: {
+  texto: {
     type: String,
-    required: true,
+    required: true
   },
   sentimento: {
     type: String,
-    enum: ['Positivo', 'Negativo', 'Neutro'],
-    required: true,
+    required: true
   },
-  nota: {
-    type: Number,
-    min: 1,
-    max: 5,
-    required: true,
-  },
-  resumoIA: {
-    type: String,
-    required: true,
-  },
-  dataCriacao: {
+  created_at: {
     type: Date,
-    default: Date.now,
-  },
+    default: Date.now
+  }
 });
 
 module.exports = mongoose.model('Feedback', FeedbackSchema);

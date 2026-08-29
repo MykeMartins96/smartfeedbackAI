@@ -10,13 +10,14 @@
   "license": "ISC",
   "description": "",
   "dependencies": {
-    "@google/genai": "^2.18.0",
+    "@google/genai": "^2.19.0",
+    "@google/generative-ai": "^0.24.1",
     "axios": "^1.19.0",
     "cors": "^2.8.6",
     "dotenv": "^17.4.2",
     "express": "^5.2.1",
     "lucide-react": "^1.33.0",
-    "mongoose": "^9.9.3",
+    "mongoose": "^9.9.4",
     "styled-components": "^6.5.3"
   }
 }

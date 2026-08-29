@@ -74,11 +74,13 @@ const Formulario = ({ aoAdicionarFeedback }) => {
       setCarregando(true);
 
       // Chamada HTTP POST oficial ligando o React ao seu servidor Node.js
-      const resposta = await api.post('/feedbacks', { comentarioBruto: texto });
+      const resposta = await api.post('/feedbacks', {
+        texto: texto
+      });
 
       // Passa o feedback analisado e salvo no MongoDB de volta para a tela principal
       aoAdicionarFeedback(resposta.data);
-      
+
       // Reseta e limpa o campo de texto após o sucesso
       setTexto('');
     } catch (erro) {
@@ -92,7 +94,7 @@ const Formulario = ({ aoAdicionarFeedback }) => {
   return (
     <ContainerForm onSubmit={manipularEnvio}>
       <Titulo>Analisar Novo Feedback</Titulo>
-      
+
       <AreaTexto
         placeholder="Cole ou digite aqui a avaliação do cliente (Ex: O produto é fantástico, mas o frete atrasou)..."
         value={texto}
