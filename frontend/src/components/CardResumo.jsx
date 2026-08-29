@@ -44,6 +44,13 @@ const Valor = styled.h3`
   color: #0f172a;
 `;
 
+const EstrelasMedia = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  margin-top: 4px;
+`;
+
 const IconeContainer = styled.div`
   padding: 12px;
   border-radius: 8px;
@@ -59,21 +66,22 @@ const IconeContainer = styled.div`
 const CardResumo = ({ feedbacks }) => {
   const totalFeedbacks = feedbacks.length;
 
-  // Considera somente os feedbacks que possuem nota
+  // Considera somente feedbacks que possuem nota
   const feedbacksComNota = feedbacks.filter(
     (feedback) => typeof feedback.nota === 'number'
   );
 
-  // Calcula a média apenas dos registros com nota
+  // Calcula a média das notas
   const mediaNotas =
     feedbacksComNota.length > 0
-      ? (
-          feedbacksComNota.reduce(
-            (acc, curr) => acc + curr.nota,
-            0
-          ) / feedbacksComNota.length
-        ).toFixed(1)
-      : '0.0';
+      ? feedbacksComNota.reduce(
+          (acc, curr) => acc + curr.nota,
+          0
+        ) / feedbacksComNota.length
+      : 0;
+
+  // Arredonda a média para decidir quantas estrelas preencher
+  const estrelasPreenchidas = Math.round(mediaNotas);
 
   const totalPositivos = feedbacks.filter(
     (f) => f.sentimento === 'Positivo'
@@ -85,6 +93,7 @@ const CardResumo = ({ feedbacks }) => {
       <Card>
         <Info>
           <Rotulo>Total Analisado</Rotulo>
+
           <Valor>{totalFeedbacks}</Valor>
         </Info>
 
@@ -97,7 +106,27 @@ const CardResumo = ({ feedbacks }) => {
       <Card>
         <Info>
           <Rotulo>Média de Notas</Rotulo>
-          <Valor>{mediaNotas} / 5.0</Valor>
+
+          <Valor>{mediaNotas.toFixed(1)} / 5.0</Valor>
+
+          <EstrelasMedia>
+            {[1, 2, 3, 4, 5].map((estrela) => (
+              <Star
+                key={estrela}
+                size={16}
+                fill={
+                  estrela <= estrelasPreenchidas
+                    ? '#eab308'
+                    : 'none'
+                }
+                color={
+                  estrela <= estrelasPreenchidas
+                    ? '#eab308'
+                    : '#cbd5e1'
+                }
+              />
+            ))}
+          </EstrelasMedia>
         </Info>
 
         <IconeContainer corFundo="#fefce8" corIcone="#eab308">
@@ -109,6 +138,7 @@ const CardResumo = ({ feedbacks }) => {
       <Card>
         <Info>
           <Rotulo>Satisfeitos (IA)</Rotulo>
+
           <Valor>{totalPositivos}</Valor>
         </Info>
 
