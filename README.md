@@ -54,3 +54,5 @@ Também resolvi problemas relacionados à comunicação entre frontend e backend
 ## 🔗 Projeto online
 
 👉 [Acessar SmartFeedback AI](https://smartfeedback-ai.vercel.app/)
+
+## 📸 Imagem do Projeto
