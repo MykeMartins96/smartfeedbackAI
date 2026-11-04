@@ -11,7 +11,8 @@ O **SmartFeedback AI** é uma aplicação que utiliza inteligência artificial p
 
 **Solução:** automatizar a análise dos feedbacks utilizando Google Gemini, organizando os resultados em indicadores visuais.
 
-## 📸 Preview
+## 📸 Imagem do Projeto:
+![SmartFeedback AI](https://github.com/MykeMartins96/smartfeedbackAI/blob/main/backend/src/Captura%20de%20tela%202026-08-23%20215402.png?raw=true)
 
 <!-- Cole aqui a linha da imagem do seu README original -->
 
