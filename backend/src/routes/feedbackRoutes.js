@@ -1,14 +1,48 @@
 const express = require('express');
-
 const router = express.Router();
-
 const { GoogleGenAI } = require('@google/genai');
-
 const Feedback = require('../models/Feedback');
 
 const ai = new GoogleGenAI({
   apiKey: process.env.GEMINI_API_KEY
 });
+
+// Função auxiliar com fallback automático para evitar erro 503
+async function gerarAnaliseComFallback(prompt) {
+  const modelos = ['gemini-2.5-flash', 'gemini-2.5-flash-lite', 'gemini-2.0-flash'];
+  let ultimoErro = null;
+
+  for (const model of modelos) {
+    try {
+      console.log(`🔄 Tentando gerar resposta com o modelo: ${model}`);
+      const response = await ai.models.generateContent({
+        model,
+        contents: prompt
+      });
+      return response;
+    } catch (error) {
+      ultimoErro = error;
+      const status = error?.status || '';
+      const msg = error?.message || '';
+
+      if (
+        status === 503 ||
+        status === 429 ||
+        status === 404 ||
+        msg.includes('503') ||
+        msg.includes('UNAVAILABLE') ||
+        msg.includes('overloaded')
+      ) {
+        console.warn(`⚠️ Modelo ${model} indisponível (${status}). Tentando próximo modelo...`);
+        continue;
+      }
+
+      throw error;
+    }
+  }
+
+  throw ultimoErro || new Error('Todos os modelos do Gemini estão temporariamente indisponíveis.');
+}
 
 // CRIAR FEEDBACK
 const criarFeedback = async (req, res) => {
@@ -27,43 +61,41 @@ const criarFeedback = async (req, res) => {
 
     console.log('📩 Feedback recebido:', texto);
 
-    const response = await ai.models.generateContent({
-      model: 'gemini-3.6-flash',
-      contents: `
-        Analise o feedback abaixo.
+    const prompt = `
+      Analise o feedback abaixo.
 
-        Responda APENAS neste formato:
+      Responda APENAS neste formato:
 
-        sentimento|nota|resumo
+      sentimento|nota|resumo
 
-        Regras:
+      Regras:
 
-        - sentimento deve ser:
-          Positivo, Negativo ou Neutro
+      - sentimento deve ser:
+        Positivo, Negativo ou Neutro
 
-        - nota deve ser um número inteiro de 1 a 5
+      - nota deve ser um número inteiro de 1 a 5
 
-        - resumo deve ser uma opinião curta e objetiva
-          sobre o que o cliente demonstrou no feedback
+      - resumo deve ser uma opinião curta e objetiva
+        sobre o que o cliente demonstrou no feedback
 
-        Não use o caractere "|" dentro do resumo.
+      Não use o caractere "|" dentro do resumo.
 
-        Exemplos:
+      Exemplos:
 
-        Positivo|5|O cliente demonstrou muita satisfação com o produto e o atendimento.
+      Positivo|5|O cliente demonstrou muita satisfação com o produto e o atendimento.
 
-        Neutro|3|O cliente gostou do produto, mas demonstrou insatisfação com o prazo de entrega.
+      Neutro|3|O cliente gostou do produto, mas demonstrou insatisfação com o prazo de entrega.
 
-        Negativo|1|O cliente ficou insatisfeito com o produto e com a qualidade do atendimento.
+      Negativo|1|O cliente ficou insatisfeito com o produto e com a qualidade do atendimento.
 
-        Feedback: "${texto}"
-      `
-    });
+      Feedback: "${texto}"
+    `;
+
+    const response = await gerarAnaliseComFallback(prompt);
 
     console.log('🤖 Resposta Gemini:', response.text);
 
     const respostaIA = response.text.trim();
-
     const partes = respostaIA.split('|');
 
     const sentimento = partes[0]?.trim();
@@ -128,7 +160,6 @@ const listarFeedbacks = async (req, res) => {
 
 // ROTAS
 router.post('/feedbacks', criarFeedback);
-
 router.get('/feedbacks', listarFeedbacks);
 
 module.exports = router;
