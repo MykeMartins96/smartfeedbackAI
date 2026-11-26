@@ -98,8 +98,8 @@ const criarFeedback = async (req, res) => {
     const respostaIA = response.text.trim();
     const partes = respostaIA.split('|');
 
-    const sentimento = partes[0]?.trim();
-    const nota = Number(partes[1]?.trim());
+    const sentimento = partes.at(0)?.trim();
+    const nota = Number(partes.at(1)?.trim());
 
     const resumoIA = partes.slice(2).join('|').trim();
 
