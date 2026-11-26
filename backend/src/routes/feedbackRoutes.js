@@ -100,6 +100,7 @@ const criarFeedback = async (req, res) => {
 
     const sentimento = partes[0]?.trim();
     const nota = Number(partes[1]?.trim());
+
     const resumoIA = partes.slice(2).join('|').trim();
 
     // Validação da resposta da IA
